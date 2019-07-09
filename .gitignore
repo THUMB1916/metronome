@@ -1,0 +1,6 @@
+.idea/
+.vscode/
+__pycache__/
+res/backup/
+config.json
+output.wav
