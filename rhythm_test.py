@@ -13,6 +13,9 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(595, 227)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/images/res/icon_metronome.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("#centralwidget {border-image: url(:/images/res/background.jpg);}\n"
 "\n"
 "QPushButton{border-style:none;padding:10px;border-radius:5px;color:#FFFFFF;background:#34495E;}\n"
@@ -63,3 +66,4 @@ class Ui_MainWindow(object):
         self.button_rhythm_test_stop.setText(_translate("MainWindow", "停止测试"))
 
 
+import resources_rc

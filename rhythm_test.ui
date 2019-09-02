@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>节奏测试</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/res/icon_metronome.png</normaloff>:/images/res/icon_metronome.png</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">#centralwidget {border-image: url(:/images/res/background.jpg);}
 
@@ -80,6 +84,8 @@ QPushButton:pressed{color:#B8C6D1;background:#2D3E50;}</string>
    </layout>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -23,12 +23,17 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         self.button_inc_bpm.clicked.connect(self.increase_bpm)
         self.button_dec_bpm.clicked.connect(self.decrease_bpm)
         self.slider_bpm.sliderMoved.connect(self.slider_moved)
+        self.radio_standard.toggled.connect(self.standard_beat_toggled)
+        self.radio_customized.toggled.connect(self.customized_beat_toggled)
         self.button_play.clicked.connect(self.play)
         self.button_test.clicked.connect(self.test)
 
         self.slider_bpm.setValue(int(self.label_bpm.text()))
-        self.combo_signature.addItems(['2拍子', '3拍子', '4拍子', '5拍子', '6拍子', '7拍子', '8拍子'])
-        self.combo_division.addItems(['1连音', '2连音', '3连音', '4连音', '5连音', '6连音', '7连音', '8连音'])
+        self.radio_standard.toggle()
+        self.combo_signature.addItems(
+            ['2拍子', '3拍子', '4拍子', '5拍子', '6拍子', '7拍子', '8拍子'])
+        self.combo_division.addItems(
+            ['1连音', '2连音', '3连音', '4连音', '5连音', '6连音', '7连音', '8连音'])
         self.combo_sound.addItems(os.listdir('res/sound packs'))
 
         self.metronome = Metronome()
@@ -37,11 +42,15 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         if os.path.isfile('config.json'):
             with open('config.json') as f:
                 config = json.load(f)
-                self.label_bpm.setText(config.get('beat'))
-                self.combo_signature.setCurrentText(config.get('time_signature'))
+                self.label_bpm.setText(config.get('tempo'))
+                self.radio_customized.setChecked(config.get('customized'))
+                self.combo_signature.setCurrentText(
+                    config.get('time_signature'))
                 self.combo_division.setCurrentText(config.get('division'))
                 self.combo_sound.setCurrentText(config.get('sound_pack'))
                 self.check_accent.setChecked(config.get('first_beat_accent'))
+                self.edit_beat_definition.setText(
+                    config.get('beat_definition'))
 
                 self.slider_bpm.setValue(int(self.label_bpm.text()))
 
@@ -52,7 +61,7 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
     def set_80bpm(self):
         self.label_bpm.setText(str(80))
         self.slider_bpm.setValue(int(self.label_bpm.text()))
-    
+
     def set_100bpm(self):
         self.label_bpm.setText(str(100))
         self.slider_bpm.setValue(int(self.label_bpm.text()))
@@ -74,14 +83,35 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
     def slider_moved(self):
         self.label_bpm.setText(str(self.slider_bpm.value()))
 
+    def standard_beat_toggled(self):
+        self.combo_division.setEnabled(True)
+        self.combo_signature.setEnabled(True)
+        self.check_accent.setEnabled(True)
+        self.edit_beat_definition.setEnabled(False)
+
+    def customized_beat_toggled(self):
+        self.combo_division.setEnabled(False)
+        self.combo_signature.setEnabled(False)
+        self.check_accent.setEnabled(False)
+        self.edit_beat_definition.setEnabled(True)
+
     def play(self):
-        self.metronome.beat = int(self.label_bpm.text())
-        self.metronome.time_signature = int(self.combo_signature.currentText()[0])
+        self.metronome.tempo = int(self.label_bpm.text())
+        self.metronome.customized = self.radio_customized.isChecked()
+        self.metronome.time_signature = int(
+            self.combo_signature.currentText()[0])
         self.metronome.division = int(self.combo_division.currentText()[0])
         self.metronome.first_beat_accent = self.check_accent.isChecked()
-        self.metronome.filename_first_beep = 'res/sound packs/' + self.combo_sound.currentText() + '/beep_first_beat.wav'
-        self.metronome.filename_beep = 'res/sound packs/' + self.combo_sound.currentText() + '/beep.wav'
-        self.metronome.filename_weak_beep = 'res/sound packs/' + self.combo_sound.currentText() + '/beep_weak.wav'
+        self.metronome.beat_definition = []
+        for beat in self.edit_beat_definition.text().split('/'):
+            self.metronome.beat_definition.append(
+                [int(beep) for beep in beat.split()])
+        self.metronome.filename_first_beep = 'res/sound packs/' + \
+            self.combo_sound.currentText() + '/beep_first_beat.wav'
+        self.metronome.filename_beep = 'res/sound packs/' + \
+            self.combo_sound.currentText() + '/beep.wav'
+        self.metronome.filename_weak_beep = 'res/sound packs/' + \
+            self.combo_sound.currentText() + '/beep_weak.wav'
         self.metronome.begin()
         self.button_play.clicked.disconnect(self.play)
         self.button_play.clicked.connect(self.stop)
@@ -93,6 +123,9 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         self.button_inc_bpm.setEnabled(False)
         self.button_dec_bpm.setEnabled(False)
         self.slider_bpm.setEnabled(False)
+        self.radio_standard.setEnabled(False)
+        self.radio_customized.setEnabled(False)
+        self.edit_beat_definition.setEnabled(False)
         self.combo_division.setEnabled(False)
         self.combo_signature.setEnabled(False)
         self.combo_sound.setEnabled(False)
@@ -110,21 +143,27 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         self.button_inc_bpm.setEnabled(True)
         self.button_dec_bpm.setEnabled(True)
         self.slider_bpm.setEnabled(True)
-        self.combo_division.setEnabled(True)
-        self.combo_signature.setEnabled(True)
+        self.radio_standard.setEnabled(True)
+        self.radio_customized.setEnabled(True)
         self.combo_sound.setEnabled(True)
-        self.check_accent.setEnabled(True)
+
+        if self.radio_standard.isChecked():
+            self.standard_beat_toggled()
+        else:
+            self.customized_beat_toggled()
 
     def test(self):
         self.rhythm_test_window = RhythmTestUi()
 
     def closeEvent(self, event):
         config = {}
-        config['beat'] = self.label_bpm.text()
+        config['tempo'] = self.label_bpm.text()
+        config['customized'] = self.radio_customized.isChecked()
         config['time_signature'] = self.combo_signature.currentText()
         config['division'] = self.combo_division.currentText()
         config['sound_pack'] = self.combo_sound.currentText()
         config['first_beat_accent'] = self.check_accent.isChecked()
+        config['beat_definition'] = self.edit_beat_definition.text()
         with open('config.json', 'w') as f:
             json.dump(config, f)
 
@@ -152,7 +191,7 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
         if event.text() == 'g' and self.start_flag:
             if not self.Timer.isActive():
                 self.begin_test()
-            else: 
+            else:
                 self.click_time.append(time.time())
 
     def begin_test(self):
@@ -162,6 +201,7 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
 
     def stop_test(self):
         self.init_vars()
+        self.button_rhythm_test_stop.setText('停止测试')
         self.button_rhythm_test_stop.setEnabled(False)
         self.Timer.stop()
 
@@ -169,12 +209,15 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
         if (time.time() - self.click_time[0]) >= 20.0:
             self.Timer.stop()
             self.label_timer.setText('{:.2f}s'.format(20.0))
-            result = np.array([self.click_time[i] - self.click_time[i - 1] for i in range(1, len(self.click_time))])
-            self.label_result.setText('平均值：{}拍\n标准差：{:.3f}s'.format(int(round(60 / np.mean(result))), np.std(result)))
+            result = np.array([self.click_time[i] - self.click_time[i - 1]
+                               for i in range(1, len(self.click_time))])
+            self.label_result.setText('平均值：{}拍\n标准差：{:.3f}s'.format(
+                int(round(60 / np.mean(result))), np.std(result)))
             self.button_rhythm_test_stop.setText('重新开始')
             self.start_flag = False
-        else: 
-            self.label_timer.setText('{:.2f}s'.format(time.time() - self.click_time[0]))
+        else:
+            self.label_timer.setText('{:.2f}s'.format(
+                time.time() - self.click_time[0]))
 
 
 if __name__ == '__main__':

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>667</width>
-    <height>357</height>
+    <width>700</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,10 @@
   </property>
   <property name="windowTitle">
    <string>节拍器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/res/icon_metronome.png</normaloff>:/images/res/icon_metronome.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">#centralwidget {border-image: url(:/images/res/background.jpg);}
@@ -84,7 +88,7 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
    <property name="styleSheet">
     <string notr="true"/>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,2,1,1">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,2,1,0,1">
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0,0">
       <property name="spacing">
@@ -209,6 +213,9 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
           <bold>false</bold>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true"/>
         </property>
@@ -224,6 +231,9 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
           <family>Adobe Devanagari</family>
           <pointsize>14</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
         </property>
         <property name="styleSheet">
          <string notr="true"/>
@@ -293,7 +303,7 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,3,0,3,0,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="0,0,3,0,3,0">
       <property name="leftMargin">
        <number>20</number>
       </property>
@@ -306,6 +316,18 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
       <property name="bottomMargin">
        <number>0</number>
       </property>
+      <item>
+       <widget class="QRadioButton" name="radio_standard">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>标准节拍</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QLabel" name="label_5">
         <property name="font">
@@ -355,6 +377,68 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="check_accent">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>重音</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,3,0,0,0">
+      <property name="spacing">
+       <number>6</number>
+      </property>
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QRadioButton" name="radio_customized">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+         </font>
+        </property>
+        <property name="text">
+         <string>自定义节拍</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="edit_beat_definition">
+        <property name="font">
+         <font>
+          <family>Times New Roman</family>
+         </font>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="QLabel" name="label">
         <property name="font">
          <font>
@@ -372,21 +456,6 @@ QSlider::handle:horizontal{width:13px;margin-top:-3px;margin-bottom:-3px;border-
          <font>
           <family>微软雅黑</family>
          </font>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="check_accent">
-        <property name="font">
-         <font>
-          <family>微软雅黑</family>
-         </font>
-        </property>
-        <property name="text">
-         <string>重音</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -5,15 +5,22 @@ import os
 
 class Metronome:
     def __init__(self):
-        self.beat = 120
+        self.tempo = 120
+        self.customized = False
+
+        # fields for standard beats
         self.time_signature = 4
         self.division = 1
+        self.first_beat_accent = True
+
+        # fields for customized beats
+        self.beat_definition = []
+
         self.total_time = 60
         self.filename_first_beep = ''
         self.filename_beep = ''
         self.filename_weak_beep = ''
         self.filename_output = ''
-        self.first_beat_accent = True
         self.sound = None
 
     def begin(self):
@@ -35,78 +42,100 @@ class Metronome:
         # check the properties
         if f.getparams()[:3] != f_first_beat.getparams()[:3] or f.getparams()[:3] != f_weak.getparams()[:3]:
             return False
-        
+
         # get the properties
         framerate = f.getframerate()
         nchannels = f.getnchannels()
         sampwidth = f.getsampwidth()
 
         # open output sound file
-        output = wave.open(self.filename_output, 'wb')
-        output.setframerate(framerate)
-        output.setnchannels(nchannels)
-        output.setsampwidth(sampwidth)
+        f_out = wave.open(self.filename_output, 'wb')
+        f_out.setframerate(framerate)
+        f_out.setnchannels(nchannels)
+        f_out.setsampwidth(sampwidth)
 
-        # calculate relavant frame counts
-        time_per_sub_beat = 60 / (self.beat * self.division)
-        time_of_beep = f.getnframes() / framerate
-        time_of_blank = time_per_sub_beat - time_of_beep
-        nframes_of_blank = int(time_of_blank * framerate)
         nframes_total = int(self.total_time * framerate)
-
-        time_of_beep_first_beat = f_first_beat.getnframes() / framerate
-        time_of_blank_first_beat = time_per_sub_beat - time_of_beep_first_beat
-        nframes_of_blank_first_beat = int(time_of_blank_first_beat * framerate)
-
-        time_of_beep_weak = f_weak.getnframes() / framerate
-        time_of_blank_weak = time_per_sub_beat - time_of_beep_weak
-        nframes_of_blank_weak = int(time_of_blank_weak * framerate)
-
         # output frames
-        frame_count = 0
-        while frame_count < nframes_total:
-            # output first beat
-            if self.first_beat_accent:
-                output.writeframes(f_first_beat.readframes(f_first_beat.getnframes()))
-                output.writeframes(bytes([0 for _ in range(nframes_of_blank_first_beat * sampwidth * nchannels)]))
-                f_first_beat.rewind()
-                frame_count += f_first_beat.getnframes() + nframes_of_blank_first_beat
-            else: 
-                output.writeframes(f.readframes(f.getnframes()))
-                output.writeframes(bytes([0 for _ in range(nframes_of_blank * sampwidth * nchannels)]))
-                f.rewind()
-                frame_count += f.getnframes() + nframes_of_blank
+        if self.customized:
+            while f_out.getnframes() < nframes_total:
+                for beat in self.beat_definition:
+                    # calculate relavant frame counts
+                    time_per_sub_beat = 60 / (self.tempo * len(beat))
+                    nframes_per_sub_beat = int(time_per_sub_beat * framerate)
+                    nbytes_per_sub_beat = nframes_per_sub_beat * sampwidth * nchannels
 
-            # output weak beats
-            for _ in range(self.division - 1):
-                output.writeframes(f_weak.readframes(f_weak.getnframes()))
-                output.writeframes(bytes([0 for _ in range(nframes_of_blank_weak * sampwidth * nchannels)]))
-                f_weak.rewind()
-                frame_count += f_weak.getnframes() + nframes_of_blank_weak
+                    time_of_beep = f.getnframes() / framerate
+                    time_of_blank = time_per_sub_beat - time_of_beep
+                    nframes_of_blank = int(time_of_blank * framerate)
+                    nbytes_of_blank = nframes_of_blank * sampwidth * nchannels
 
-            # output normal beats
-            for _ in range(self.time_signature - 1):
-                output.writeframes(f.readframes(f.getnframes()))
-                output.writeframes(bytes([0 for _ in range(nframes_of_blank * sampwidth * nchannels)]))
-                f.rewind()
-                frame_count += f.getnframes() + nframes_of_blank
+                    time_of_beep_first_beat = f_first_beat.getnframes() / framerate
+                    time_of_blank_first_beat = time_per_sub_beat - time_of_beep_first_beat
+                    nframes_of_blank_first_beat = int(
+                        time_of_blank_first_beat * framerate)
+                    nbytes_of_blank_first_beat = nframes_of_blank_first_beat * sampwidth * nchannels
 
-                # output weak beats
-                for _ in range(self.division - 1):
-                    output.writeframes(f_weak.readframes(f_weak.getnframes()))
-                    output.writeframes(bytes([0 for _ in range(nframes_of_blank_weak * sampwidth * nchannels)]))
-                    f_weak.rewind()
-                    frame_count += f_weak.getnframes() + nframes_of_blank_weak
+                    time_of_beep_weak = f_weak.getnframes() / framerate
+                    time_of_blank_weak = time_per_sub_beat - time_of_beep_weak
+                    nframes_of_blank_weak = int(time_of_blank_weak * framerate)
+                    nbytes_of_blank_weak = nframes_of_blank_weak * sampwidth * nchannels
 
-        output.close()
+                    for beep in beat:
+                        if beep == 1:
+                            self.output_beeps(
+                                f_weak, f_out, nbytes_of_blank_weak)
+                        elif beep == 2:
+                            self.output_beeps(f, f_out, nbytes_of_blank)
+                        elif beep == 3:
+                            self.output_beeps(
+                                f_first_beat, f_out, nbytes_of_blank_first_beat)
+                        else:
+                            f_out.writeframes(
+                                bytes([0 for _ in range(nbytes_per_sub_beat)]))
+        else:
+            # calculate relavant frame counts
+            time_per_sub_beat = 60 / (self.tempo * self.division)
+            nframes_per_sub_beat = int(time_per_sub_beat * framerate)
+            nbytes_per_sub_beat = nframes_per_sub_beat * sampwidth * nchannels
 
+            time_of_beep = f.getnframes() / framerate
+            time_of_blank = time_per_sub_beat - time_of_beep
+            nframes_of_blank = int(time_of_blank * framerate)
+            nbytes_of_blank = nframes_of_blank * sampwidth * nchannels
 
-if __name__ == '__main__':
-    metronome = Metronome()
-    metronome.begin()
-    import time
-    time.sleep(2)
-    metronome.stop()
-    time.sleep(2)
-    metronome.begin()
-    time.sleep(10)
+            time_of_beep_first_beat = f_first_beat.getnframes() / framerate
+            time_of_blank_first_beat = time_per_sub_beat - time_of_beep_first_beat
+            nframes_of_blank_first_beat = int(
+                time_of_blank_first_beat * framerate)
+            nbytes_of_blank_first_beat = nframes_of_blank_first_beat * sampwidth * nchannels
+
+            time_of_beep_weak = f_weak.getnframes() / framerate
+            time_of_blank_weak = time_per_sub_beat - time_of_beep_weak
+            nframes_of_blank_weak = int(time_of_blank_weak * framerate)
+            nbytes_of_blank_weak = nframes_of_blank_weak * sampwidth * nchannels
+
+            while f_out.getnframes() < nframes_total:
+                # output first beat
+                if self.first_beat_accent:
+                    self.output_beeps(f_first_beat, f_out,
+                                      nbytes_of_blank_first_beat)
+                else:
+                    self.output_beeps(f, f_out, nbytes_of_blank)
+
+                # output weak sub beats
+                self.output_beeps(
+                    f_weak, f_out, nbytes_of_blank_weak, self.division - 1)
+
+                # output normal beats
+                for _ in range(self.time_signature - 1):
+                    self.output_beeps(f, f_out, nbytes_of_blank)
+                    self.output_beeps(
+                        f_weak, f_out, nbytes_of_blank_weak, self.division - 1)
+
+        f_out.close()
+
+    def output_beeps(self, f_in, f_out, nbytes_of_blank, n=1):
+        for _ in range(n):
+            f_out.writeframes(f_in.readframes(f_in.getnframes()))
+            f_out.writeframes(bytes([0 for _ in range(nbytes_of_blank)]))
+            f_in.rewind()
