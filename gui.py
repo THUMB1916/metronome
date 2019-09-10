@@ -211,8 +211,8 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
             self.label_timer.setText('{:.2f}s'.format(20.0))
             result = np.array([self.click_time[i] - self.click_time[i - 1]
                                for i in range(1, len(self.click_time))])
-            self.label_result.setText('平均值：{}拍\n标准差：{:.3f}s'.format(
-                int(round(60 / np.mean(result))), np.std(result)))
+            self.label_result.setText('平均值：{} BPM\n标准差：{:.2f} BPM'.format(
+                int(round(60 / np.mean(result))), np.std(60 / result)))
             self.button_rhythm_test_stop.setText('重新开始')
             self.start_flag = False
         else:
