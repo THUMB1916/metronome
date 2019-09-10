@@ -173,6 +173,15 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
         super().__init__()
         self.setupUi(self)
 
+        self.SUPPORTED_KEYS = ['A', 'B', 'C', 'D', 'E', 'F', 'G',
+                               'H', 'I', 'J', 'K', 'L', 'M', 'N',
+                               'O', 'P', 'Q', 'R', 'S', 'T', 'U',
+                               'V', 'W', 'X', 'Y', 'Z',
+                               'a', 'b', 'c', 'd', 'e', 'f', 'g',
+                               'h', 'i', 'j', 'k', 'l', 'm', 'n',
+                               'o', 'p', 'q', 'r', 's', 't', 'u',
+                               'v', 'w', 'x', 'y', 'z']
+
         self.button_rhythm_test_stop.clicked.connect(self.stop_test)
 
         self.Timer = QTimer()
@@ -188,7 +197,7 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
         self.label_result.setText('')
 
     def keyPressEvent(self, event):
-        if event.text() == 'g' and self.start_flag:
+        if event.text() in self.SUPPORTED_KEYS and self.start_flag:
             if not self.Timer.isActive():
                 self.begin_test()
             else:
