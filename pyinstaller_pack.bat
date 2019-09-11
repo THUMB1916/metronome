@@ -1,0 +1,1 @@
+pyinstaller -F -w -i res\icon_metronome.ico --add-data "res\sound packs;res\sound packs" gui.py
