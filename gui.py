@@ -17,6 +17,13 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         super().__init__()
         self.setupUi(self)
 
+        if getattr(sys, 'frozen', False):
+            self.base_path = sys._MEIPASS
+        else:
+            self.base_path = os.path.dirname(os.path.abspath(__file__))
+        self.sound_pack_path = os.path.join(
+            self.base_path, 'res', 'sound packs')
+
         self.button_80bpm.clicked.connect(self.set_80bpm)
         self.button_100bpm.clicked.connect(self.set_100bpm)
         self.button_120bpm.clicked.connect(self.set_120bpm)
@@ -34,7 +41,7 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
             ['2拍子', '3拍子', '4拍子', '5拍子', '6拍子', '7拍子', '8拍子'])
         self.combo_division.addItems(
             ['1连音', '2连音', '3连音', '4连音', '5连音', '6连音', '7连音', '8连音'])
-        self.combo_sound.addItems(os.listdir('res/sound packs'))
+        self.combo_sound.addItems(os.listdir(self.sound_pack_path))
 
         self.metronome = Metronome()
         self.metronome.filename_output = 'output.wav'
@@ -106,12 +113,12 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
         for beat in self.edit_beat_definition.text().split('/'):
             self.metronome.beat_definition.append(
                 [int(beep) for beep in beat.split()])
-        self.metronome.filename_first_beep = 'res/sound packs/' + \
-            self.combo_sound.currentText() + '/beep_first_beat.wav'
-        self.metronome.filename_beep = 'res/sound packs/' + \
-            self.combo_sound.currentText() + '/beep.wav'
-        self.metronome.filename_weak_beep = 'res/sound packs/' + \
-            self.combo_sound.currentText() + '/beep_weak.wav'
+        self.metronome.filename_first_beep = os.path.join(
+            self.sound_pack_path, self.combo_sound.currentText() + '/beep_first_beat.wav')
+        self.metronome.filename_beep = os.path.join(
+            self.sound_pack_path, self.combo_sound.currentText() + '/beep.wav')
+        self.metronome.filename_weak_beep = os.path.join(
+            self.sound_pack_path, self.combo_sound.currentText() + '/beep_weak.wav')
         self.metronome.begin()
         self.button_play.clicked.disconnect(self.play)
         self.button_play.clicked.connect(self.stop)
