@@ -27,7 +27,7 @@ QPushButton:pressed{color:#B8C6D1;background:#2D3E50;}</string>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout">
+     <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1,0,0">
       <item>
        <widget class="QLabel" name="label_timer">
         <property name="font">
@@ -59,6 +59,38 @@ QPushButton:pressed{color:#B8C6D1;background:#2D3E50;}</string>
          <string/>
         </property>
        </widget>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="check_autostop">
+          <property name="font">
+           <font>
+            <family>微软雅黑</family>
+           </font>
+          </property>
+          <property name="text">
+           <string>测试开始时自动停止节拍器</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QPushButton" name="button_rhythm_test_stop">

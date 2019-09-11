@@ -160,7 +160,7 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
             self.customized_beat_toggled()
 
     def test(self):
-        self.rhythm_test_window = RhythmTestUi()
+        self.rhythm_test_window = RhythmTestUi(self)
 
     def closeEvent(self, event):
         config = {}
@@ -176,7 +176,7 @@ class MetronomeUi(metronome_window.Ui_MainWindow, QMainWindow):
 
 
 class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
-    def __init__(self):
+    def __init__(self, metronome_ui):
         super().__init__()
         self.setupUi(self)
 
@@ -188,6 +188,8 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
                                'h', 'i', 'j', 'k', 'l', 'm', 'n',
                                'o', 'p', 'q', 'r', 's', 't', 'u',
                                'v', 'w', 'x', 'y', 'z']
+
+        self.metronome_ui = metronome_ui
 
         self.button_rhythm_test_stop.clicked.connect(self.stop_test)
 
@@ -211,6 +213,8 @@ class RhythmTestUi(rhythm_test.Ui_MainWindow, QMainWindow):
                 self.click_time.append(time.time())
 
     def begin_test(self):
+        if self.check_autostop.isChecked() and (not self.metronome_ui.slider_bpm.isEnabled()):
+            self.metronome_ui.stop()
         self.button_rhythm_test_stop.setEnabled(True)
         self.click_time.append(time.time())
         self.Timer.start(50)

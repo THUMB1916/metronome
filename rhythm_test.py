@@ -44,6 +44,19 @@ class Ui_MainWindow(object):
         self.label_result.setText("")
         self.label_result.setObjectName("label_result")
         self.verticalLayout.addWidget(self.label_result)
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout.addItem(spacerItem)
+        self.check_autostop = QtWidgets.QCheckBox(self.centralwidget)
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        self.check_autostop.setFont(font)
+        self.check_autostop.setChecked(True)
+        self.check_autostop.setObjectName("check_autostop")
+        self.horizontalLayout.addWidget(self.check_autostop)
+        self.horizontalLayout.setStretch(0, 1)
+        self.verticalLayout.addLayout(self.horizontalLayout)
         self.button_rhythm_test_stop = QtWidgets.QPushButton(self.centralwidget)
         self.button_rhythm_test_stop.setEnabled(False)
         font = QtGui.QFont()
@@ -53,6 +66,8 @@ class Ui_MainWindow(object):
         self.button_rhythm_test_stop.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.button_rhythm_test_stop.setObjectName("button_rhythm_test_stop")
         self.verticalLayout.addWidget(self.button_rhythm_test_stop)
+        self.verticalLayout.setStretch(0, 1)
+        self.verticalLayout.setStretch(1, 1)
         self.verticalLayout_2.addLayout(self.verticalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
 
@@ -63,6 +78,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "节奏测试"))
         self.label_timer.setText(_translate("MainWindow", "0.00"))
+        self.check_autostop.setText(_translate("MainWindow", "测试开始时自动停止节拍器"))
         self.button_rhythm_test_stop.setText(_translate("MainWindow", "停止测试"))
 
 
